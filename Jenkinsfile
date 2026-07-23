@@ -1,14 +1,27 @@
 pipeline {
     agent any
+    
+    parameters {
+        choice(name: 'ENV', choices: ['a','b'])
+    }
     stages {
-        stage('Build') {
-            steps { echo 'Building' }
-        }
-        stage('Tests') {
-            parallel {
-                stage('Unit') { steps { sh 'echo Unit tests' } }
-                stage('Integration') { steps { sh 'echo Integration tests' } }
+        stage ('Build') {
+            steps {
+                sh "echo Building for ${params.ENV}"
             }
+        }
+        stage('Deploy') {
+            when {
+                expression {params.ENV == 'b'}
+            }
+            steps {
+                sh 'echo Deploying'
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Done'
         }
     }
 }
